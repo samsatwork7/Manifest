@@ -15,6 +15,7 @@ output/
 # Allow wordlists
 *.txt
 !wordlists/*.txt
+!requirements.txt
 
 # Build artifacts
 dist/
