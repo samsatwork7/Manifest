@@ -1,10 +1,15 @@
-# manifest_core/cli/parser.py
 import argparse
 
 def build_parser():
     parser = argparse.ArgumentParser(
         description="Manifest v2.0 — Next-Gen Reconnaissance Framework",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s -d example.com --passive
+  %(prog)s -d example.com --all --resolve-dns
+  %(prog)s -d example.com --passive --html --json --txt --output reports/
+        """
     )
     
     # Required argument
@@ -78,12 +83,23 @@ def build_parser():
     )
     
     # Output options
-    parser.add_argument(
+    output_group = parser.add_argument_group('Output Options')
+    output_group.add_argument(
         "--html",
         action="store_true",
         help="Generate HTML report"
     )
-    parser.add_argument(
+    output_group.add_argument(
+        "--json",
+        action="store_true",
+        help="Generate JSON report"
+    )
+    output_group.add_argument(
+        "--txt",
+        action="store_true",
+        help="Generate TXT report (simple subdomain list)"
+    )
+    output_group.add_argument(
         "--output",
         help="Output directory for reports"
     )

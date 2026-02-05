@@ -1,5 +1,8 @@
 import asyncio
 import socket
+import os
+import time
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from rich.console import Console
 from manifest_core.modules.filters import SmartFilter
@@ -26,6 +29,25 @@ try:
 except ImportError:
     HAS_TAKEOVER = False
     TakeoverDetector = None
+
+# Output imports
+try:
+    from manifest_core.output.html_report import HTMLReport
+    HAS_HTML = True
+except ImportError:
+    HAS_HTML = False
+
+try:
+    from manifest_core.output.json_writer import JSONWriter
+    HAS_JSON = True
+except ImportError:
+    HAS_JSON = False
+
+try:
+    from manifest_core.output.txt_writer import TXTWriter
+    HAS_TXT = True
+except ImportError:
+    HAS_TXT = False
 
 
 class ManifestRunner:
@@ -121,6 +143,9 @@ class ManifestRunner:
 
     async def run(self):
         results = {}
+        
+        # Track total time
+        start_time = time.time()
 
         # ─────────────────────────────────────────────
         # 1. PASSIVE ENUMERATION
@@ -242,11 +267,27 @@ class ManifestRunner:
         results["subdomains"] = all_subdomains
         results["total_found"] = len(all_subdomains)
         results["domain"] = self.args.domain
+        
+        # Add duration
+        total_time = time.time() - start_time
+        results["duration"] = total_time
 
         # ─────────────────────────────────────────────
-        # 8. HTML REPORT GENERATION
+        # 8. OUTPUT REPORTS (HTML, JSON, TXT)
         # ─────────────────────────────────────────────
-        if getattr(self.args, "html", False):
+        output_dir = getattr(self.args, "output", None)
+        
+        # Create output directory if specified
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+            self.console.print(f"[cyan][*][/cyan] Output directory: {output_dir}")
+        
+        # Get timestamp for all reports
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_domain = self.args.domain.replace(".", "_")
+        
+        # HTML Report
+        if getattr(self.args, "html", False) and HAS_HTML:
             try:
                 self.console.print("[yellow][*][/yellow] Generating HTML report...")
                 
@@ -294,43 +335,107 @@ class ManifestRunner:
                                 "cname": "N/A"
                             })
                 
-                # Directory handling
-                import os
-                from datetime import datetime
-                
-                output_dir = self.args.output if getattr(self.args, "output", None) else "."
-                
-                if output_dir and not os.path.exists(output_dir):
-                    os.makedirs(output_dir, exist_ok=True)
-                
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                safe_domain = self.args.domain.replace(".", "_")
-                filename = f"manifest_{safe_domain}_{timestamp}.html"
-                filepath = os.path.join(output_dir, filename)
+                # Generate filename and path
+                if output_dir:
+                    html_path = os.path.join(output_dir, f"manifest_{safe_domain}_{timestamp}.html")
+                else:
+                    html_path = f"manifest_{safe_domain}_{timestamp}.html"
                 
                 # Write HTML report
-                from manifest_core.output.html_report import HTMLReport
-                HTMLReport.write(filepath, self.args.domain, html_subdomains, html_takeovers)
+                HTMLReport.write(html_path, self.args.domain, html_subdomains, html_takeovers)
                 
-                self.console.print(f"[green][✓][/green] HTML report saved: [cyan]{filepath}[/cyan]")
+                self.console.print(f"[green][✓][/green] HTML report saved: [cyan]{html_path}[/cyan]")
                 
-                # Optional JSON export
-                if getattr(self.args, "json", False):
-                    from manifest_core.output.json_writer import JSONWriter
-                    json_path = filepath.replace(".html", ".json")
-                    JSONWriter.write(json_path, results)
-                    self.console.print(f"[green][✓][/green] JSON report saved: [cyan]{json_path}[/cyan]")
-                
-            except ImportError as e:
-                self.console.print(f"[red][!][/red] HTML report module error: {e}")
             except Exception as e:
                 self.console.print(f"[red][!][/red] Failed to generate HTML report: {e}")
                 import traceback
                 self.console.print(f"[dim]{traceback.format_exc()}[/dim]")
+        elif getattr(self.args, "html", False) and not HAS_HTML:
+            self.console.print("[yellow][!][/yellow] HTML report module not available")
+        
+        # JSON Report
+        if getattr(self.args, "json", False) and HAS_JSON:
+            try:
+                self.console.print("[yellow][*][/yellow] Generating JSON report...")
+                
+                # Prepare data for JSON
+                json_data = {
+                    'metadata': {
+                        'tool': 'Manifest v2.0',
+                        'domain': self.args.domain,
+                        'scan_date': datetime.now().isoformat(),
+                        'duration': total_time,
+                        'options': vars(self.args)
+                    },
+                    'statistics': {
+                        'total_subdomains': len(all_subdomains),
+                        'live_subdomains': results.get('resolved_count', 0),
+                        'takeover_candidates': len(results.get('takeovers', [])),
+                        'passive_count': results.get('passive_count', 0),
+                        'brute_count': results.get('brute_count', 0),
+                        'perm_count': results.get('perm_count', 0),
+                        'filtered_count': results.get('filtered_count', len(all_subdomains))
+                    },
+                    'subdomains': all_subdomains,
+                    'resolved_ips': resolved_ips,
+                    'takeovers': results.get('takeovers', [])
+                }
+                
+                # Generate filename and path
+                if output_dir:
+                    json_path = os.path.join(output_dir, f"manifest_{safe_domain}_{timestamp}.json")
+                else:
+                    json_path = f"manifest_{safe_domain}_{timestamp}.json"
+                
+                # Write JSON report
+                JSONWriter.write_enhanced(json_path, json_data)
+                
+                self.console.print(f"[green][✓][/green] JSON report saved: [cyan]{json_path}[/cyan]")
+                
+            except Exception as e:
+                self.console.print(f"[red][!][/red] Failed to generate JSON report: {e}")
+                import traceback
+                self.console.print(f"[dim]{traceback.format_exc()}[/dim]")
+        elif getattr(self.args, "json", False) and not HAS_JSON:
+            self.console.print("[yellow][!][/yellow] JSON report module not available")
+        
+        # TXT Report
+        if getattr(self.args, "txt", False) and HAS_TXT:
+            try:
+                self.console.print("[yellow][*][/yellow] Generating TXT report...")
+                
+                # Generate filename and path
+                if output_dir:
+                    txt_path = os.path.join(output_dir, f"manifest_{safe_domain}_{timestamp}.txt")
+                else:
+                    txt_path = f"manifest_{safe_domain}_{timestamp}.txt"
+                
+                # Prepare data for TXT
+                txt_data = []
+                for sub in all_subdomains:
+                    ip_data = resolved_ips.get(sub, {})
+                    ipv4 = ip_data.get('ipv4', [])
+                    ipv6 = ip_data.get('ipv6', [])
+                    
+                    if ipv4 or ipv6:
+                        ips = ', '.join(ipv4 + ipv6)
+                        txt_data.append({'subdomain': sub, 'ips': ips})
+                    else:
+                        txt_data.append({'subdomain': sub, 'ips': ''})
+                
+                # Write TXT report
+                TXTWriter.write(txt_path, txt_data)
+                
+                self.console.print(f"[green][✓][/green] TXT report saved: [cyan]{txt_path}[/cyan]")
+                
+            except Exception as e:
+                self.console.print(f"[red][!][/red] Failed to generate TXT report: {e}")
+                import traceback
+                self.console.print(f"[dim]{traceback.format_exc()}[/dim]")
+        elif getattr(self.args, "txt", False) and not HAS_TXT:
+            self.console.print("[yellow][!][/yellow] TXT report module not available")
 
         # ─────────────────────────────────────────────
-        # 9. PREPARE FINAL RESULTS
+        # 9. RETURN FINAL RESULTS
         # ─────────────────────────────────────────────
-        # Summary display is now handled in main.py
-        # Return results to main function for display
         return results

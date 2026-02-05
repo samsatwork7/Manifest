@@ -16,6 +16,7 @@ parts/
 sdist/
 var/
 wheels/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -24,6 +25,10 @@ MANIFEST
 # PyInstaller
 *.manifest
 *.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
@@ -35,8 +40,12 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
+*.py,cover
 .hypothesis/
 .pytest_cache/
+cover/
+*.mo
+*.pot
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -44,6 +53,15 @@ coverage.xml
 # IPython
 profile_default/
 ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
 
 # Environments
 .env
@@ -54,12 +72,49 @@ ENV/
 env.bak/
 venv.bak/
 
-# IDE
-.vscode/
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# PyCharm
 .idea/
-*.swp
-*.swo
-*~
+*.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+.idea/aws.xml
+.idea/inspectionProfiles/
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Other IDEs
+.history/
 
 # OS
 .DS_Store
@@ -70,18 +125,69 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# Manifest specific
-reports/
-*.html
-*.json
-*.txt
-wordlists/  # If wordlists are examples
-test_output*/
-manifest_*_*.html
-manifest_*_*.json
+# Windows
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
 
 # Temporary files
 temp/
 tmp/
 *.tmp
 *.temp
+*.log
+*.log.*
+*.pid
+
+# Manifest Specific Files
+reports/
+output/
+results/
+scans/
+test_reports/
+test_output*/
+wordlists/temp/      # Temporary wordlist files
+wordlists/custom_*   # Custom generated wordlists
+
+# Manifest Generated Reports
+manifest_*.html
+manifest_*.json
+manifest_*.txt
+subdomain_*.txt
+takeover_*.txt
+
+# Database files (if using SQLite)
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files with sensitive data
+config.json
+secrets.json
+credentials.ini
+api_keys.txt
+
+# Session files
+.session
+.cache/
+
+# Logs
+logs/
+*.log
+debug.log
+error.log
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# End of .gitignore
