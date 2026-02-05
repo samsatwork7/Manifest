@@ -1,122 +1,296 @@
-# 🚀 Manifest v1.0
+# 🚀 **Manifest v2.0**
 
-### A Modern Reconnaissance Framework with Rich UI + Hybrid DNS Engine
-
-```text
-███╗   ███╗ █████╗ ███╗   ██╗██╗███████╗███████╗███████╗████████╗
-████╗ ████║██╔══██╗████╗  ██║██║██╔════╝██╔════╝██╔════╝╚══██╔══╝
-██╔████╔██║███████║██╔██╗ ██║██║█████╗  █████╗  ███████╗   ██║   
-██║╚██╔╝██║██╔══██║██║╚██╗██║██║██╔══╝  ██╔══╝  ╚════██║   ██║   
-██║ ╚═╝ ██║██║  ██║██║ ╚████║██║███████╗██║     ███████║   ██║   
-╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚══════╝╚═╝     ╚══════╝   ╚═╝   
+A Modern Reconnaissance Framework with Rich UI, Hybrid DNS Engine & Advanced Filtering
 
 ```
+███╗   ███╗ █████╗ ███╗   ██╗██╗███████╗███████╗███████╗████████╗
+████╗ ████║██╔══██╗████╗  ██║██║██╔════╝██╔════╝██╔════╝╚══██╔══╝
+██╔████╔██║███████║██╔██╗ ██║██║█████╗  █████╗  ███████╗   ██║
+██║╚██╔╝██║██╔══██║██║╚██╗██║██║██╔══╝  ██╔══╝  ╚════██║   ██║
+██║ ╚═╝ ██║██║  ██║██║ ╚████║██║███████╗██║     ███████║   ██║
+╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚══════╝╚═╝     ╚══════╝   ╚═╝
+```
 
-**Manifest** is a next-generation reconnaissance tool designed for speed, simplicity, and actionable intelligence. It combines passive data mining with high-performance active discovery.
-
----
-
-## ✨ Features
-
-* **Free Passive Enumeration:** No API keys required. Scrapes `crt.sh`, `HackerTarget`, `AlienVault`, `URLScan`, and more.
-* **Bruteforce Engine:** High-speed subdomain discovery using customizable wordlists.
-* **Permutations (DNSTwist-style):** Smart generation of mutations (hyphens, number flips, common prefixes/suffixes).
-* **Hybrid DNS Engine:** * Automatically detects and uses **MassDNS** if available.
-* Falls back to a high-concurrency **Async Resolver**.
-* Full support for IPv4 and IPv6.
-
-
-* **Wildcard Detection:** Intelligent filtering to eliminate false positives.
-* **Takeover Detection:** Identifies CNAME vulnerabilities for GitHub, S3, Azure, Heroku, and more.
-* **Rich UI & Reporting:**
-* **Terminal:** Beautiful, animated, color-coded progress via Python Rich.
-* **Dashboard:** Generates a TailwindCSS + Chart.js HTML report.
-
-
+Manifest is a powerful reconnaissance tool designed for **bug bounty hunters**, **red teams**, and **security researchers**.
+It delivers fast, accurate, and filtered asset discovery using a blend of **passive intelligence**, **bruteforce**, **mutations**, **DNS resolution**, and **takeover detection**.
 
 ---
 
-## 🚀 Installation
+# ✨ **Features**
 
-### 1. Clone the repository
+## 🔍 Passive Enumeration (Free & API-less)
+
+Collects subdomains from **15+ public intelligence sources**, such as:
+
+* crt.sh
+* HackerTarget
+* AlienVault
+* URLScan
+* ThreatCrowd
+* Riddler
+* Wayback Machine
+* RapidDNS
+* Anubis
+* BufferOver
+* CertSpotter
+  …and many more.
+
+Runs fully asynchronous → extremely fast.
+
+---
+
+## ⚡ Active Discovery
+
+### 🔨 Bruteforce Engine
+
+* Uses custom wordlists
+* Multi-threaded & optimized
+* Auto-deduplication
+
+### 🔁 Permutation Engine (DNSTwist-like)
+
+Generates:
+
+* Hyphen swaps
+* Repeated characters
+* Prefix/suffix additions
+* Numeric variations
+* TLD variants
+
+---
+
+## 🌐 DNS Resolution Engine
+
+* Async resolver for IPv4/IPv6
+* Optional **MassDNS** integration
+* Wildcard detection
+* Supports:
+
+```
+--resolve-dns
+--resolved-only
+--dns-timeout
+--max-resolve
+```
+
+---
+
+## 🛡️ Takeover Detection
+
+Identifies vulnerable **CNAME chains** across:
+
+* GitHub Pages
+* AWS S3
+* Azure
+* Cloudflare Pages
+* Heroku
+* Netlify
+* Render
+* Firebase
+* ReadTheDocs
+* Pantheon
+  …and more.
+
+Includes concurrency controls and progress indicators.
+
+---
+
+## 🧠 Smart Filtering Engine
+
+Levels:
+
+* `none` — raw results
+* `light` — basic cleanup
+* `normal` — default balanced cleanup
+* `aggressive` — high-value assets only
+* `intelligent` — heuristic ranking
+
+Supports:
+
+* Noise removal
+* Wildcard trimming
+* Subdomain profiling
+* Categorization (admin/API/dev/CDN)
+
+---
+
+## 🖥 Rich Terminal UI (Powered by Rich)
+
+* Premium ASCII banner
+* Color-coded logs
+* Progress bars
+* Tables & summaries
+* Highlighted critical findings
+
+---
+
+## 📊 Reporting System
+
+### 📄 **HTML Dashboard (TailwindCSS + Charts.js)**
+
+Contains:
+
+* Subdomain list
+* IP resolution
+* Takeover findings
+* Statistics & charts
+* Filter stats
+* Clean, dark-themed design
+
+### 📦 JSON Output
+
+Structured, machine-readable for automation.
+
+### 📝 TXT Export
+
+Subdomain-only list for tools like:
+
+```
+httpx
+nuclei
+naabu
+katana
+```
+
+---
+
+# 📦 Installation
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/samsatwork7/Manifest.git
 cd Manifest
-
 ```
 
-### 2. Set up Environment
+### 2. Setup Virtual Environment
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-
 ```
 
-### 3. Install Dependencies
+### 3. Install Requirements
 
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
-pip install .
-
+pip install -e .
 ```
 
 ---
 
-## 💻 Usage
+# 💻 Usage
 
-### Basic Commands
+## Basic Commands
 
-| Goal | Command |
-| --- | --- |
-| **View Help** | `manifest -h` |
-| **Passive Only** | `manifest -d example.com --passive` |
-| **Full Recon** | `manifest -d example.com --all` |
-| **Custom Wordlist** | `manifest -d example.com --brute -w list.txt` |
-
-### Advanced Options
-
-* **Set Threads:** `manifest -d example.com --threads 500`
-* **Permutations Only:** `manifest -d example.com --perms`
-* **Export HTML:** `manifest -d example.com --html --output reports/`
+| Action                | Command                                       |
+| --------------------- | --------------------------------------------- |
+| Show help             | `manifest -h`                                 |
+| Passive only          | `manifest -d example.com --passive`           |
+| Full recon            | `manifest -d example.com --all`               |
+| Bruteforce            | `manifest -d example.com --brute -w list.txt` |
+| Generate permutations | `manifest -d example.com --perms`             |
 
 ---
 
-## 📊 Output Examples
+## DNS Mode
 
-### Terminal Interface
+```bash
+manifest -d example.com --resolve-dns
+manifest -d example.com --resolved-only
+```
 
-```text
+## Filtering
+
+```bash
+manifest -d example.com --filter intelligent
+manifest -d example.com --filter aggressive
+```
+
+## Reporting
+
+```bash
+manifest -d example.com --html --json --txt --output reports/
+```
+
+## Performance
+
+```bash
+manifest -d example.com --threads 500
+```
+
+---
+
+# 📊 Example Output
+
+### Terminal Summary
+
+```
 [+] Passive: 142 found
-[+] DNS: 36 live subdomains
-[+] Wildcard filtering done
-[!] 0 takeover candidates
-[✓] Recon completed successfully!
-
+[+] Bruteforce: 38 found
+[+] Permutations: 120 generated
+[+] Filtered: 96 removed
+[✓] Final: 204 subdomains
+[!] Takeovers: 2 potential risks
 ```
 
-### HTML Dashboard
+### HTML Dashboard Preview
 
-The generated report provides a dark-themed, interactive overview of your target's infrastructure, including statistical breakdowns and vulnerability alerts.
+Includes:
 
----
-
-## 🗺️ Roadmap
-
-* [ ] **v1.1:** HTTP probing (Status/Title), Favicon hashing, and Page screenshots.
-* [ ] **v1.2:** JS file extraction and API key pattern matching.
-* [ ] **v2.0:** Multi-domain parallel scanning and Nuclei integration.
-
----
-
-## 📝 License & Credits
-
-* **License:** MIT License. Feel free to modify and distribute.
-* **Author:** [Satyam Singh (@samsatwork7)](https://www.google.com/search?q=https://github.com/samsatwork7)
-* **Contributions:** Pull requests are welcome! Please open an issue first to discuss major changes.
+* Statistics
+* Charts
+* IP resolution
+* Takeover detection
+* Searchable tables
+* Modern UI
 
 ---
 
-> **Note:** This tool is for educational and ethical security testing only.
+# 🗺 Roadmap
+
+### 📌 v2.1
+
+* HTTP probing (status, title)
+* Favicon hashing
+* Tech stack detection
+
+### 📌 v2.2
+
+* JS extraction
+* API key pattern detection
+* Automated wordlist builder
+
+### 📌 v3.0
+
+* Multi-target parallel scanning
+* Nuclei integration
+* Complete asset inventory
+
+---
+
+# 📝 License
+
+Licensed under **MIT License** — fully open for modification and distribution.
+
+---
+
+# 👤 Author
+
+**Satyam Singh**
+GitHub: [@samsatwork7](https://github.com/samsatwork7)
+
+---
+
+# 🤝 Contributions
+
+Contributions and feature requests are welcome!
+Open an issue before large features.
+
+---
+
+# 🎯 Ethical Notice
+
+Manifest is intended for **authorized** testing and educational purposes only.
+Unauthorized scanning is illegal.
