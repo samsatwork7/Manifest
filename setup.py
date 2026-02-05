@@ -15,7 +15,7 @@ setup(
             "manifest=manifest.main:main"
         ]
     },
-    author="Your Name",
+    author="Satyam Singh",
     description="Manifest v1.0 — A Modern Reconnaissance Framework",
     url="https://github.com/yourusername/manifest",
     license="MIT",
