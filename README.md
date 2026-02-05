@@ -246,27 +246,6 @@ Includes:
 * Searchable tables
 * Modern UI
 
----
-
-# 🗺 Roadmap
-
-### 📌 v2.1
-
-* HTTP probing (status, title)
-* Favicon hashing
-* Tech stack detection
-
-### 📌 v2.2
-
-* JS extraction
-* API key pattern detection
-* Automated wordlist builder
-
-### 📌 v3.0
-
-* Multi-target parallel scanning
-* Nuclei integration
-* Complete asset inventory
 
 ---
 
@@ -294,3 +273,4 @@ Open an issue before large features.
 
 Manifest is intended for **authorized** testing and educational purposes only.
 Unauthorized scanning is illegal.
+
