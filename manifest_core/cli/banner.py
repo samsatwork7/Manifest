@@ -10,7 +10,7 @@ def print_banner():
 ██║ ╚═╝ ██║██║  ██║██║ ╚████║██║███████╗██║     ███████║   ██║   
 ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚══════╝╚═╝     ╚══════╝   ╚═╝   
 
-          [bold blue]Manifest v1.0 — Complete Recon Framework[/bold blue]
+          [bold blue]Manifest v2.0 — Complete Recon Framework[/bold blue]
     """
 
     Console().print(Panel(banner, border_style="cyan"))

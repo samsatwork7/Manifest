@@ -23,9 +23,19 @@ def main():
     if hasattr(args, 'filter_level') and args.filter_level != 'none':
         console.print(f"[dim]Filter level: {args.filter_level}[/dim]\n")
     
-    # Run the scan
+    # Run the scan safely
     runner = ManifestRunner(args)
-    results = asyncio.run(runner.run())
+
+    try:
+        results = asyncio.run(runner.run())
+
+    except KeyboardInterrupt:
+        console.print("\n[red][!][/red] Keyboard interrupt received. Exiting cleanly...\n")
+        return
+
+    except Exception as e:
+        console.print(f"\n[red][!][/red] Unexpected error: {e}")
+        return
     
     # Display the main summary
     if results:

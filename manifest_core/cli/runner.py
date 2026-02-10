@@ -193,7 +193,7 @@ class ManifestRunner:
             self.console.print("[yellow][!][/yellow] Permutations module not available")
             results["perm_count"] = 0
 
-        # ─────────────────────────────────────────────
+        # ────────────────────────────────────────────
         # 4. SMART FILTERING
         # ─────────────────────────────────────────────
         if hasattr(self.args, "filter_level") and self.args.filter_level != "none":
@@ -216,6 +216,12 @@ class ManifestRunner:
         # 5. DNS RESOLUTION (Conditional)
         # ─────────────────────────────────────────────
         resolved_ips = {}
+
+        # --resolved-only requires DNS resolution to be meaningful
+        if getattr(self.args, "resolved_only", False) and not getattr(self.args, "resolve_dns", False):
+            self.console.print("[yellow][!][/yellow] --resolved-only requires DNS resolution; enabling --resolve-dns automatically")
+            self.args.resolve_dns = True
+
         if getattr(self.args, "resolve_dns", False) and all_subdomains:
             # Get resolution parameters
             timeout = getattr(self.args, "dns_timeout", 2.0)
@@ -286,37 +292,37 @@ class ManifestRunner:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_domain = self.args.domain.replace(".", "_")
         
+        # Determine which subdomains to include in reports
+        if getattr(self.args, "resolved_only", False):
+            report_subdomains = [
+                sub for sub in all_subdomains
+                if sub in resolved_ips and (resolved_ips[sub]['ipv4'] or resolved_ips[sub]['ipv6'])
+            ]
+            self.console.print(
+                f"[cyan][*][/cyan] Resolved-only mode enabled: {len(report_subdomains)}/{len(all_subdomains)} subdomains"
+            )
+        else:
+            report_subdomains = all_subdomains
+
         # HTML Report
         if getattr(self.args, "html", False) and HAS_HTML:
             try:
                 self.console.print("[yellow][*][/yellow] Generating HTML report...")
                 
-                # Determine which subdomains to include in report
-                if getattr(self.args, "resolved_only", False) and resolved_ips:
-                    # Only include subdomains that resolved
-                    subs_for_report = [sub for sub in all_subdomains 
-                                     if sub in resolved_ips and (resolved_ips[sub]['ipv4'] or resolved_ips[sub]['ipv6'])]
-                    self.console.print(f"[cyan][*][/cyan] Showing {len(subs_for_report)} resolved subdomains in report")
-                else:
-                    # Show ALL subdomains in HTML report
-                    subs_for_report = all_subdomains
-                    self.console.print(f"[cyan][*][/cyan] Including all {len(all_subdomains)} subdomains in HTML report")
-                
                 # Build subdomain list for HTML with resolved IPs
                 html_subdomains = []
-                for sub in subs_for_report:
+                for sub in report_subdomains:
                     ip_data = resolved_ips.get(sub, {'ipv4': [], 'ipv6': []})
-                    
-                    # Mark interesting subdomains
-                    interesting_keywords = ["admin", "api", "vpn", "dashboard", "secure", "portal", "console"]
-                    interesting = any(kw in sub.lower() for kw in interesting_keywords)
                     
                     # Mark if resolved
                     resolved = bool(ip_data.get('ipv4') or ip_data.get('ipv6'))
-                    
+
                     html_subdomains.append({
                         "subdomain": sub,
-                        "interesting": interesting,
+                        "interesting": any(
+                            kw in sub.lower()
+                            for kw in ["admin", "api", "vpn", "dashboard", "secure", "portal", "console"]
+                        ),
                         "resolved": resolved,
                         "ipv4": ip_data.get('ipv4', []),
                         "ipv6": ip_data.get('ipv6', [])
@@ -376,7 +382,7 @@ class ManifestRunner:
                         'perm_count': results.get('perm_count', 0),
                         'filtered_count': results.get('filtered_count', len(all_subdomains))
                     },
-                    'subdomains': all_subdomains,
+                    'subdomains': report_subdomains,
                     'resolved_ips': resolved_ips,
                     'takeovers': results.get('takeovers', [])
                 }
@@ -412,7 +418,7 @@ class ManifestRunner:
                 
                 # Prepare data for TXT
                 txt_data = []
-                for sub in all_subdomains:
+                for sub in report_subdomains:
                     ip_data = resolved_ips.get(sub, {})
                     ipv4 = ip_data.get('ipv4', [])
                     ipv6 = ip_data.get('ipv6', [])
